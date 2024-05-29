@@ -1,4 +1,4 @@
-package com.pluralsight.springwebflux6.stock_trading;
+package com.pluralsight.springwebflux6.stocktrading;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
