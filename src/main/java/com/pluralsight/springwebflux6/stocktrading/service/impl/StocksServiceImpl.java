@@ -7,6 +7,7 @@ import com.pluralsight.springwebflux6.stocktrading.exception.StockNotFoundExcept
 import com.pluralsight.springwebflux6.stocktrading.model.repository.StocksRepository;
 import com.pluralsight.springwebflux6.stocktrading.service.StocksService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -14,6 +15,7 @@ import reactor.core.publisher.Mono;
 import java.math.BigDecimal;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class StocksServiceImpl implements StocksService {
 
@@ -23,14 +25,24 @@ public class StocksServiceImpl implements StocksService {
     public Mono<StockResponse> getOneStock(String id) {
         return stocksRepository.findById(id)
                 .map(StockResponse::fromModel)
-                .switchIfEmpty(Mono.error(new StockNotFoundException("Stock not found with id: " + id)));
+                .switchIfEmpty(Mono.error(new StockNotFoundException("Stock not found with id: " + id)))
+                .doFirst(() -> log.info("Retrieving stock with id: {}", id))
+                .doOnNext(stock -> log.info("Stock found: {}", stock))
+                .doOnError(ex -> log.error("Something went wrong while retrieving the stock with id: {}", id))
+                .doOnTerminate(() -> log.info("Finalized retrieving stock"))
+                .doFinally(signalType -> log.info("Finalized retrieving stock with signal type: {}", signalType));
     }
 
     @Override
     public Flux<StockResponse> getAllStocks(BigDecimal priceGreaterThan) {
         return stocksRepository.findAll()
                 .filter(stock -> stock.getPrice().compareTo(priceGreaterThan) > 0)
-                .map(StockResponse::fromModel);
+                .map(StockResponse::fromModel)
+                .doFirst(() -> log.info("Retrieving all stocks"))
+                .doOnNext(stock -> log.info("Stock found: {}", stock))
+                .doOnError(ex -> log.warn("Something went wrong while retrieving the stocks", ex))
+                .doOnTerminate(() -> log.info("Finalized retrieving stocks"))
+                .doFinally(signalType -> log.info("Finalized retrieving stock with signal type: {}", signalType));
     }
 
     @Override
