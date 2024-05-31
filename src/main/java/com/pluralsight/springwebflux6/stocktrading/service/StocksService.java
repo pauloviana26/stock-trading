@@ -1,13 +1,14 @@
 package com.pluralsight.springwebflux6.stocktrading.service;
 
-import com.pluralsight.springwebflux6.stocktrading.model.Stock;
+import com.pluralsight.springwebflux6.stocktrading.dto.StockRequest;
+import com.pluralsight.springwebflux6.stocktrading.dto.StockResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 public interface StocksService {
-    Mono<Stock> getOneStock(String id);
+    Mono<StockResponse> getOneStock(String id);
 
-    Flux<Stock> getAllStocks();
+    Flux<StockResponse> getAllStocks();
 
-    Mono<Stock> createStock(Stock stock);
+    Mono<StockResponse> createStock(StockRequest stock);
 }

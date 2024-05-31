@@ -1,5 +1,7 @@
 package com.pluralsight.springwebflux6.stocktrading.controller;
 
+import com.pluralsight.springwebflux6.stocktrading.dto.StockRequest;
+import com.pluralsight.springwebflux6.stocktrading.dto.StockResponse;
 import com.pluralsight.springwebflux6.stocktrading.model.Stock;
 import com.pluralsight.springwebflux6.stocktrading.service.StocksService;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +17,17 @@ public class StockController {
     private final StocksService stocksService;
 
     @GetMapping("/{id}")
-    public Mono<Stock> getOneStock(@PathVariable String id) {
+    public Mono<StockResponse> getOneStock(@PathVariable String id) {
         return stocksService.getOneStock(id);
     }
 
     @GetMapping
-    public Flux<Stock> getAllStocks() {
+    public Flux<StockResponse> getAllStocks() {
         return stocksService.getAllStocks();
     }
 
     @PostMapping
-    public Mono<Stock> createStock(@RequestBody Stock stock) {
-        return stocksService.createStock(stock);
+    public Mono<StockResponse> createStock(@RequestBody StockRequest stockRequest) {
+        return stocksService.createStock(stockRequest);
     }
 }

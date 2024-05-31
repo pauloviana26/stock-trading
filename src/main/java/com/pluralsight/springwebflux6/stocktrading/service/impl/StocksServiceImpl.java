@@ -1,6 +1,7 @@
 package com.pluralsight.springwebflux6.stocktrading.service.impl;
 
-import com.pluralsight.springwebflux6.stocktrading.model.Stock;
+import com.pluralsight.springwebflux6.stocktrading.dto.StockRequest;
+import com.pluralsight.springwebflux6.stocktrading.dto.StockResponse;
 import com.pluralsight.springwebflux6.stocktrading.model.repository.StocksRepository;
 import com.pluralsight.springwebflux6.stocktrading.service.StocksService;
 import lombok.RequiredArgsConstructor;
@@ -15,17 +16,20 @@ public class StocksServiceImpl implements StocksService {
     private final StocksRepository stocksRepository;
 
     @Override
-    public Mono<Stock> getOneStock(String id) {
-        return stocksRepository.findById(id);
+    public Mono<StockResponse> getOneStock(String id) {
+        return stocksRepository.findById(id)
+                .map(StockResponse::fromModel);
     }
 
     @Override
-    public Flux<Stock> getAllStocks() {
-        return stocksRepository.findAll();
+    public Flux<StockResponse> getAllStocks() {
+        return stocksRepository.findAll()
+                .map(StockResponse::fromModel);
     }
 
     @Override
-    public Mono<Stock> createStock(Stock stock) {
-        return stocksRepository.save(stock);
+    public Mono<StockResponse> createStock(StockRequest stockRequest) {
+        return stocksRepository.save(stockRequest.toModel())
+                .map(StockResponse::fromModel);
     }
 }
