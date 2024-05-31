@@ -2,6 +2,8 @@ package com.pluralsight.springwebflux6.stocktrading.service.impl;
 
 import com.pluralsight.springwebflux6.stocktrading.dto.StockRequest;
 import com.pluralsight.springwebflux6.stocktrading.dto.StockResponse;
+import com.pluralsight.springwebflux6.stocktrading.exception.StockCreationException;
+import com.pluralsight.springwebflux6.stocktrading.exception.StockNotFoundException;
 import com.pluralsight.springwebflux6.stocktrading.model.repository.StocksRepository;
 import com.pluralsight.springwebflux6.stocktrading.service.StocksService;
 import lombok.RequiredArgsConstructor;
@@ -20,7 +22,8 @@ public class StocksServiceImpl implements StocksService {
     @Override
     public Mono<StockResponse> getOneStock(String id) {
         return stocksRepository.findById(id)
-                .map(StockResponse::fromModel);
+                .map(StockResponse::fromModel)
+                .switchIfEmpty(Mono.error(new StockNotFoundException("Stock not found with id: " + id)));
     }
 
     @Override
@@ -32,7 +35,14 @@ public class StocksServiceImpl implements StocksService {
 
     @Override
     public Mono<StockResponse> createStock(StockRequest stockRequest) {
-        return stocksRepository.save(stockRequest.toModel())
-                .map(StockResponse::fromModel);
+        return Mono.just(stockRequest)
+                .map(StockRequest::toModel)
+                .flatMap(stock -> stocksRepository.save(stockRequest.toModel()))
+                .map(StockResponse::fromModel)
+                // .onErrorReturn(StockResponse.builder().build())
+                // .onErrorResume(ex -> Mono.just(StockResponse.builder().build()))
+                .onErrorMap(ex -> new StockCreationException(ex.getMessage()))
+                ;
+
     }
 }
