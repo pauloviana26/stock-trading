@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 public class StocksServiceImpl implements StocksService {
@@ -22,8 +24,9 @@ public class StocksServiceImpl implements StocksService {
     }
 
     @Override
-    public Flux<StockResponse> getAllStocks() {
+    public Flux<StockResponse> getAllStocks(BigDecimal priceGreaterThan) {
         return stocksRepository.findAll()
+                .filter(stock -> stock.getPrice().compareTo(priceGreaterThan) > 0)
                 .map(StockResponse::fromModel);
     }
 
