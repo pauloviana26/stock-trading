@@ -1,4 +1,4 @@
-package com.pluralsight.springwebflux6.stock_trading;
+package com.pluralsight.springwebflux6;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
